@@ -1,0 +1,83 @@
+name: VideoQuick
+options:
+  bundleIdPrefix: com.volodyatoxic
+  deploymentTarget:
+    macOS: '14.0'
+packages:
+  VideoQuick:
+    path: .
+settings:
+  base:
+    SWIFT_VERSION: '5.0'
+    ARCHS: arm64
+    CODE_SIGN_STYLE: Manual
+    CODE_SIGN_IDENTITY: Apple Development
+    ENABLE_HARDENED_RUNTIME: YES
+    MARKETING_VERSION: '0.1.0'
+    CURRENT_PROJECT_VERSION: '1'
+targets:
+  VideoQuick:
+    type: application
+    platform: macOS
+    sources:
+      - path: Sources/VideoQuickApp
+      - path: Resources/ThirdParty/Feather-LICENSE.txt
+        buildPhase: resources
+    dependencies:
+      - package: VideoQuick
+        product: VideoQuickCore
+      - target: VideoQuickFinder
+        embed: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.volodyatoxic.VideoQuick
+    info:
+      path: Resources/App-Info.plist
+      properties:
+        CFBundleDisplayName: VideoQuick
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSPrincipalClass: NSApplication
+        NSHighResolutionCapable: true
+        LSUIElement: true
+        LSMultipleInstancesProhibited: true
+        LSApplicationCategoryType: public.app-category.video
+        CFBundleURLTypes:
+          - CFBundleURLName: VideoQuick requests
+            CFBundleURLSchemes: [videoquick]
+        CFBundleDocumentTypes:
+          - CFBundleTypeName: Video
+            CFBundleTypeRole: Editor
+            LSHandlerRank: Alternate
+            LSItemContentTypes: [com.apple.quicktime-movie, public.mpeg-4]
+  VideoQuickFinder:
+    type: app-extension
+    platform: macOS
+    sources: [Sources/FinderExtension]
+    dependencies:
+      - package: VideoQuick
+        product: VideoQuickCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.volodyatoxic.VideoQuick.Finder
+        APPLICATION_EXTENSION_API_ONLY: YES
+        SKIP_INSTALL: YES
+    entitlements:
+      path: Resources/Finder.entitlements
+      properties:
+        com.apple.security.app-sandbox: true
+    info:
+      path: Resources/Finder-Info.plist
+      properties:
+        CFBundleDisplayName: VideoQuick Finder
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSExtension:
+          NSExtensionAttributes: {}
+          NSExtensionPointIdentifier: com.apple.FinderSync
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).FinderSync
+schemes:
+  VideoQuick:
+    build:
+      targets:
+        VideoQuick: all
